@@ -7,6 +7,7 @@ var Planet = function (radius, imgName, x, y) {
 	// TODO - figure out circular physics/drawing.
 
 	this.sprite = game.add.sprite(x, y, imgName);
+	this.sprite.scale.setTo(2 * radius / 100, 2 * radius / 100);
 	
 	// Setup physics for the planet
 	game.physics.p2.enableBody(this.sprite);
@@ -22,12 +23,18 @@ function GameState() {}
 
 GameState.prototype.preload = function(){
 	game.load.image('sun', 'assets/SunSprite.png');
+	game.load.image('planet', 'assets/PlanetsTexture.png');
 }
 
 GameState.prototype.create = function(){
   game.physics.startSystem(Phaser.Physics.P2JS);
   
   player = new Planet(32, 'sun', game.world.centerX, game.world.centerY);
+  
+  planetList = new Array();
+  
+  planetList[0] = player;
+  planetList[1] = new Planet(32, 'planet', game.world.centerX, game.world.centerY);
 
   //player.body.collideWorldBounds = true;
   //player.body.gravity.y = 900;
@@ -35,7 +42,8 @@ GameState.prototype.create = function(){
   // Create a group for all the planets
   planetGroup = game.add.group();
   
-  planetGroup.add(player.sprite);
+  for (var i = 0; i < planetList.length; ++i)
+	planetGroup.add(planetList[i].sprite);
   
   cursors = game.input.keyboard.createCursorKeys();
   jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
@@ -43,16 +51,17 @@ GameState.prototype.create = function(){
 }
 
 GameState.prototype.update = function(){
-  movePlayer();
+  movePlanet(player, cursors);
 }
-function movePlayer(){
-  if (cursors.left.isDown) {player.sprite.body.force.x = -100;}   //player.sprite movement
-  else if (cursors.right.isDown){player.sprite.body.force.x = 100;}
-  else {player.sprite.body.force.x = 0;}
+
+function movePlanet(planet, cursors){
+  if (cursors.left.isDown) {planet.sprite.body.force.x = -100;}   //player.sprite movement
+  else if (cursors.right.isDown){planet.sprite.body.force.x = 100;}
+  else {planet.sprite.body.force.x = 0;}
   
-  if (cursors.up.isDown){player.sprite.body.force.y = -100;}
-  else if (cursors.down.isDown){player.sprite.body.force.y = 100;}
-  else {player.sprite.body.force.y = 0;}
+  if (cursors.up.isDown){planet.sprite.body.force.y = -100;}
+  else if (cursors.down.isDown){planet.sprite.body.force.y = 100;}
+  else {planet.sprite.body.force.y = 0;}
 }
 
 GameState.prototype.render = function(){}
