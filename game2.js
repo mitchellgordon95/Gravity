@@ -2,6 +2,13 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: p
 
 function preload(){}
 
+var Planet = function (radius, speed, direction, rotation) {
+	this.radius = radius;
+	this.speed = speed;
+	this.direction = direction;
+	this.rotation = rotation;
+}
+
 function create(){
   game.physics.startSystem(Phaser.Physics.ARCADE);
 
