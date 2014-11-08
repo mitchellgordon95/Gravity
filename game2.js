@@ -2,11 +2,18 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: p
 
 function preload(){}
 
-var Planet = function (radius, speed, direction, rotation) {
+var Planet = function (radius, game) {
+	// Attributes.
 	this.radius = radius;
-	this.speed = speed;
-	this.direction = direction;
-	this.rotation = rotation;
+	this.speed = 0;
+	this.direction = 0;
+	this.rotation = 0;
+	
+	// Create sprites and add to the Phaser game.
+	this.sprite = game.add.bitmapData(32, 32);
+	this.sprite.ctx.rect(0, 0, 32, 32);
+	this.sprite.ctx.fillStyle = "#0f0";
+	this.sprite.ctx.fill();
 }
 
 function create(){
