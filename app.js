@@ -4,7 +4,7 @@ var server = require('http').Server(app);
 app.use(express.static(__dirname + '/public'));
 var io = require('socket.io')(server);
 
-server.listen(80);
+server.listen(4000);
 
 // Assign ID's linearly
 var nextID = 0;
@@ -37,7 +37,7 @@ io.sockets.on('connection', function(socket) {
 			// Generate a random color
 			var color = Math.floor(Math.random() * 12000000 + 4000000);
 			io.hosts[keyword].emit('add_planet', nextID, color);
-			
+
 			socket.clientID = nextID;
 			callback(nextID, color);
 			++nextID;

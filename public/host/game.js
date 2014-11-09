@@ -103,14 +103,14 @@ Planet.prototype.siphon = function(other) {
 	this.radius = Math.sqrt(Math.pow(this.radius, 2) + siphonConstant * Math.pow(other.radius, 2));
 	// Shrink them
 	other.radius = Math.sqrt(Math.pow(other.radius, 2) * siphonConstant);
-	
+
 	// If they're small enough, kill them.
 	if (other.radius <= 15)
 		other.kill();
 	else {
 		other.resize();
 	}
-	
+
 	// Resize us
 	this.resize();
 }
@@ -136,7 +136,7 @@ GameState.prototype.create = function(){
 
   //player.body.collideWorldBounds = true;
 
-  server = io.connect('http://localhost');
+  server = io.connect('http://localhost:4000');
 
   // When we connect to the server
   server.on('connect', function() {

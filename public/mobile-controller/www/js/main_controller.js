@@ -8,7 +8,7 @@
     var keyword = 'default_keyword';
     var cb = function() {
       //alert('cb')
-      server = io.connect("http://172.31.252.190");
+      server = io.connect("http://172.31.252.246:4000");
       // When we connect to the server
       server.on('connect', function() {
         console.log('Connected to server.');
