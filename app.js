@@ -28,6 +28,6 @@ io.sockets.on('connection', function(socket) {
 	// When a client moves, tell the host to update its position.
 	socket.on('input_event', function(clientID, input) {
 		console.log('input_event');
-		io.host.emit('input_event', clientID, input);
+		io.host.emit('move_planet', clientID, input);
 	});
 });

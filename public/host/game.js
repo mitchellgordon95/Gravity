@@ -1,12 +1,11 @@
-var player;
 var planetList;
 var planetGroup;
 var server;
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', GameState);
 
 var Planet = function (radius, imgName, x, y) {
-	// TODO - figure out circular physics/drawing.
-
+	this.input = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};	
+	
 	this.sprite = game.add.sprite(x, y, imgName);
 	this.sprite.scale.setTo(2 * radius / 100, 2 * radius / 100);
 	
@@ -30,11 +29,7 @@ GameState.prototype.preload = function(){
 GameState.prototype.create = function(){
   game.physics.startSystem(Phaser.Physics.P2JS);
   
-  player = new Planet(32, 'sun', game.world.centerX, game.world.centerY);
-  
   planetList = new Array();
-  
-  planetList.push(player);
 
   //player.body.collideWorldBounds = true;
 
@@ -43,9 +38,6 @@ GameState.prototype.create = function(){
   
   for (var i = 0; i < planetList.length; ++i)
 	planetGroup.add(planetList[i].sprite);
-  
-  cursors = game.input.keyboard.createCursorKeys();
-  jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
   
   server = io.connect('http://localhost');
   
@@ -62,25 +54,31 @@ GameState.prototype.create = function(){
 	});
 	
 	// If we get an input event, move the planet accordingly.
-	server.on('input_event', function (clientID, input) {
+	server.on('move_planet', function (clientID, input) {
 		console.log('Input Event');
-		if (!typeof planetList[clientID] === 'undefined')
-			movePlanet(planetList[clientID], input);
+		planetList[clientID].input = input;
 	});
 }
 
 GameState.prototype.update = function(){
-  movePlanet(player, cursors);
+	for (var i = 0; i < planetList.length; ++i)
+		movePlanet(planetList[i]);
 }
 
-function movePlanet(planet, cursors){
-  if (cursors.left.isDown) {planet.sprite.body.force.x = -100;}   //player.sprite movement
-  else if (cursors.right.isDown){planet.sprite.body.force.x = 100;}
-  else {planet.sprite.body.force.x = 0;}
-  
-  if (cursors.up.isDown){planet.sprite.body.force.y = -100;}
-  else if (cursors.down.isDown){planet.sprite.body.force.y = 100;}
-  else {planet.sprite.body.force.y = 0;}
+function movePlanet(planet){
+  if (planet.input.type == "cursors") {
+	  var cursors = planet.cursors;
+	  if (cursors.left.isDown) {planet.sprite.body.force.x = -100;}   //player.sprite movement
+	  else if (cursors.right.isDown){planet.sprite.body.force.x = 100;}
+	  else {planet.sprite.body.force.x = 0;}
+	  
+	  if (cursors.up.isDown){planet.sprite.body.force.y = -100;}
+	  else if (cursors.down.isDown){planet.sprite.body.force.y = 100;}
+	  else {planet.sprite.body.force.y = 0;}
+	}
+	else if (planet.input.type == "tilt") {
+		
+	}
 }
 
 GameState.prototype.render = function(){}

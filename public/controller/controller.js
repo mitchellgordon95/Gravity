@@ -1,4 +1,4 @@
-  server = io.connect('http://localhost');
+  server = io.connect("http://172.31.252.190");
   var clientID;
   // When we connect to the server
   server.on('connect', function() {
