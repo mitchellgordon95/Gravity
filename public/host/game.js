@@ -86,17 +86,6 @@ Planet.prototype.ressurect = function() {
 
 var siphonConstant = 0.3;
 
-Planet.prototype.shrink = function() {
-	var old = this.radius;
-	this.radius = Math.sqrt(Math.pow(this.radius, 2) * siphonConstant);
-	if (this.radius <= 15)
-		this.kill();
-	else {
-		this.resize();
-	}
-
-	return old;
-}
 
 // Resets the sprite and body to match the radius.
 Planet.prototype.resize = function() {
@@ -104,8 +93,20 @@ Planet.prototype.resize = function() {
 	this.sprite.body.setCircle(this.radius, 0, 0, 0);
 }
 
-Planet.prototype.grow = function(otherRadius) {
-	this.radius = Math.sqrt(Math.pow(this.radius, 2) + siphonConstant * Math.pow(otherRadius, 2));
+Planet.prototype.siphon = function(other) {
+	// Grow us
+	this.radius = Math.sqrt(Math.pow(this.radius, 2) + siphonConstant * Math.pow(other.radius, 2));
+	// Shrink them
+	other.radius = Math.sqrt(Math.pow(other.radius, 2) * siphonConstant);
+	
+	// If they're small enough, kill them.
+	if (other.radius <= 15)
+		other.kill();
+	else {
+		other.resize();
+	}
+	
+	// Resize us
 	this.resize();
 }
 
@@ -183,7 +184,7 @@ GameState.prototype.update = function(){
 			var asteroid = game.add.sprite(randomX(), randomY(), 'asteroid');
 			// Setup physics for the planet
 			game.physics.p2.enableBody(asteroid);
-			asteroid.body.angularVelocity = 300;
+			asteroid.body.angularVelocity = 2;
 			// This is used in collision detection.
 			asteroid.body.asteroid = asteroid;
 		}
@@ -203,7 +204,7 @@ GameState.prototype.update = function(){
 				if (id === 'length' || !planet.siphoning.hasOwnProperty(id)) continue;
 
 				if (planet.siphoning[id] == 0) {
-					planet.grow(planetList[id].shrink());
+					planet.siphon(planetList[id]);
 				}
 				else if (planet.siphoning[id] < 0) {
 					// Do nothing.
