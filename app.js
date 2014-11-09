@@ -1,10 +1,10 @@
 var express = require('express');
 var app = express();
-var server = require('http').Server(app); 
+var server = require('http').Server(app);
 app.use(express.static(__dirname + '/public'));
 var io = require('socket.io')(server);
 
-server.listen(80);
+server.listen(4000);
 
 // Assign ID's linearly
 var nextID = 0;
@@ -28,7 +28,7 @@ io.sockets.on('connection', function(socket) {
 	});
 	// When a client moves, tell the host to update its position.
 	socket.on('input_event', function(clientID, input) {
-		console.log('input_event');
+		console.log(input);
 		io.host.emit('move_planet', clientID, input);
 	});
 });
