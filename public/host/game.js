@@ -6,6 +6,7 @@ var spacebar;
 var gameProgress;
 var windowWidth = window.innerWidth;
 var windowHeight = window.innerHeight;
+var asteroidGroup, asteroidSpawnCounter = 0, asteroidRand;
 var keyword = 'default_keyword';
 var startRadius = 32;
 
@@ -24,8 +25,6 @@ var Planet = function (radius, imgName, tint, x, y, id) {
 	this.tint = tint;
 	this.exists = true;
 	this.radius = radius;
-
-
 	this.spriteAndPhysics(imgName, x, y);
 
 	this.resize();
@@ -56,6 +55,11 @@ Planet.prototype.onBeginContact = function(body, shapeA, shapeB, equation) {
 	// We are touching another planet
 	if (body && body.planet && body.planet.radius < this.radius)
 		this.siphoning[body.planet.id] = 0;
+	// We are touching an asteroid
+	if (body && body.asteroid) {
+		this.grow(15);
+		asteroid.kill();
+	}
 }
 
 Planet.prototype.onEndContact = function(body, shapeA, shapeB, equation) {
@@ -77,7 +81,7 @@ Planet.prototype.ressurect = function() {
 	if (this.sprite)
 		this.sprite.kill();
 	this.radius = startRadius;
-	this.spriteAndPhysics('planet', game.rnd.between(startRadius, windowWidth - startRadius), game.rnd.between(startRadius, windowHeight - startRadius));
+	this.spriteAndPhysics('planet', randomX(), randomY());
 }
 
 Planet.prototype.shrink = function() {
@@ -108,7 +112,8 @@ function GameState() {}
 
 GameState.prototype.preload = function(){
 	game.load.image('stars', 'assets/starfield.png');
-	game.load.image('planet', 'assets/PlanetsTexture.png');
+	game.load.image('asteroid', 'assets/asteroid.png');
+	game.load.image('planet', 'assets/planet.png');
 }
 
 GameState.prototype.create = function(){
@@ -135,7 +140,7 @@ GameState.prototype.create = function(){
 	server.on('add_planet', function (clientID) {
 		console.log('New Client');
 		if (gameProgress == Progress.WAITING) {
-			planetList[clientID] = new Planet(startRadius, 'planet', 0x0000ff, game.rnd.between(startRadius, windowWidth - startRadius), game.rnd.between(startRadius, windowHeight - startRadius, clientID), clientID);
+			planetList[clientID] = new Planet(startRadius, 'planet', 0x0000ff, randomX(), randomY(), clientID);
 			++planetCount;
 			++usersConnected;
 		}
@@ -165,9 +170,24 @@ GameState.prototype.update = function(){
 	// If the game hasn't started, wait for the space bar to start
 	if (gameProgress == Progress.WAITING && spacebar.isDown)
 		startGame();
-	// If the game is over, end it.
-	if (gameProgress == Progress.RUNNING && isGameOver())
-		endGame();
+	// If the game is running.
+	if (gameProgress == Progress.RUNNING) {
+		// Check if the game is over yet.
+		if (isGameOver())
+			endGame();
+		// If asteroid count is 0, spawn an asteroid
+		if (asteroidSpawnCounter == 0) {
+			asteroidRand = game.rnd.between(60, 360);
+			var asteroid = game.add.sprite(randomX(), randomY(), 'asteroid');
+			// Setup physics for the planet
+			game.physics.p2.enableBody(asteroid);
+			asteroid.body.angularVelocity = 300;
+			// This is used in collision detection.
+			asteroid.body.asteroid = asteroid;
+		}
+		// Increment it until it reaches a random value
+		asteroidSpawnCounter = (asteroidSpawnCounter + 1) % asteroidRand;
+	}
 	// If the game has ended, wait for the space bar to restart
 	if (gameProgress == Progress.FINISHED && spacebar.isDown)
 		resetGame();
@@ -256,4 +276,12 @@ function resetGame() {
 
 	// Setup the game again.
 	setupGame();
+}
+
+function randomX() {
+	return game.rnd.between(startRadius, windowWidth - startRadius);
+}
+
+function randomY() {
+	return game.rnd.between(startRadius, windowHeight - startRadius);
 }
