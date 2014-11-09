@@ -58,7 +58,7 @@ Planet.prototype.onBeginContact = function(body, shapeA, shapeB, equation) {
 	// We are touching an asteroid
 	if (body && body.asteroid) {
 		this.grow(15);
-		asteroid.kill();
+		body.asteroid.kill();
 	}
 }
 
@@ -128,7 +128,7 @@ GameState.prototype.create = function(){
 
   //player.body.collideWorldBounds = true;
 
-  server = io.connect('http://172.31.252.246:4000');
+  server = io.connect('http://localhost:4000');
 
   // When we connect to the server
   server.on('connect', function() {
@@ -168,7 +168,7 @@ GameState.prototype.create = function(){
 GameState.prototype.update = function(){
 
 	// If the game hasn't started, wait for the space bar to start
-	if (gameProgress == Progress.WAITING && spacebar.isDown)
+	if (gameProgress == Progress.WAITING && spacebar.isDown && planetCount > 1)
 		startGame();
 	// If the game is running.
 	if (gameProgress == Progress.RUNNING) {
