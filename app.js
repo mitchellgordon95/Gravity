@@ -35,7 +35,7 @@ io.sockets.on('connection', function(socket) {
 			console.log('Client added to host with "' + keyword + '" and ID '+nextID);
 			// TODO - Move this somewhere better
 			// Generate a random color
-			var color = Math.floor(Math.random() * 14000);
+			var color = Math.floor(Math.random() * 12000000 + 4000000);
 			io.hosts[keyword].emit('add_planet', nextID, color);
 			
 			socket.clientID = nextID;
