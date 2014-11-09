@@ -1,4 +1,4 @@
-  server = io.connect("http://172.31.252.246:4000");
+  server = io.connect("http://172.31.252.190");
   var clientID;
   var color;
   var keyword = 'default_keyword';
@@ -8,7 +8,7 @@
 	  server.emit('client_join', keyword, function(ID, mColor) {
 		  clientID = ID;
 		  color = mColor;
-		  window.document.body.style.color = color.toString(16);
+		  document.body.style.backgroundColor = "#" + mColor.toString(16);
 	  });
   });
 
