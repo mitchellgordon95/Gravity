@@ -136,7 +136,7 @@ GameState.prototype.create = function(){
 
   //player.body.collideWorldBounds = true;
 
-  server = io.connect('http://localhost:4000');
+  server = io.connect('http://localhost');
 
   // When we connect to the server
   server.on('connect', function() {
@@ -145,10 +145,10 @@ GameState.prototype.create = function(){
   });
 
 	// If a client connects, add a planet to the screen.
-	server.on('add_planet', function (clientID) {
+	server.on('add_planet', function (clientID, color) {
 		console.log('New Client');
 		if (gameProgress == Progress.WAITING) {
-			planetList[clientID] = new Planet(startRadius, 'planet', 0x0000ff, randomX(), randomY(), clientID);
+			planetList[clientID] = new Planet(startRadius, 'planet', color, randomX(), randomY(), clientID);
 			++planetCount;
 			++usersConnected;
 		}

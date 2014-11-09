@@ -4,7 +4,7 @@ var server = require('http').Server(app);
 app.use(express.static(__dirname + '/public'));
 var io = require('socket.io')(server);
 
-server.listen(4000);
+server.listen(80);
 
 // Assign ID's linearly
 var nextID = 0;
@@ -33,9 +33,13 @@ io.sockets.on('connection', function(socket) {
 		console.log('Client trys to join with "' + keyword + '"');
 		if (io.hosts[keyword]) {
 			console.log('Client added to host with "' + keyword + '" and ID '+nextID);
-			io.hosts[keyword].emit('add_planet', nextID);
+			// TODO - Move this somewhere better
+			// Generate a random color
+			var color = Math.floor(Math.random() * 12000000 + 4000000);
+			io.hosts[keyword].emit('add_planet', nextID, color);
+			
 			socket.clientID = nextID;
-			callback(nextID);
+			callback(nextID, color);
 			++nextID;
 		}
 		else {
