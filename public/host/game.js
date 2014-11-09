@@ -74,6 +74,11 @@ Planet.prototype.kill = function() {
 	this.sprite.kill();
 }
 
+Planet.prototype.grow = function (amount) {
+	this.radius += amount;
+	this.resize();
+}
+
 Planet.prototype.ressurect = function() {
 	this.exists = true;
 	++planetCount;
