@@ -8,7 +8,7 @@
 	});
   });
 
-var cursors = {left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
+var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
 	
 window.onkeydown = function(e) {
 	var keynum;
