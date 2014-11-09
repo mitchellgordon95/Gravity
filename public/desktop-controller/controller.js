@@ -8,7 +8,7 @@
 	  server.emit('client_join', keyword, function(ID, mColor) {
 		  clientID = ID;
 		  color = mColor;
-		  window.document.body.style.color = color;
+		  window.document.body.style.color = color.toString(16);
 	  });
   });
 
