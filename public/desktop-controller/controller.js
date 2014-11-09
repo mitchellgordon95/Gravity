@@ -1,9 +1,10 @@
   server = io.connect("http://172.31.252.190");
   var clientID;
+  var keyword = 'default_keyword';
   // When we connect to the server
   server.on('connect', function() {
 	console.log('Connected to server.');
-	server.emit('client_join', function(ID) {
+	server.emit('client_join', keyword, function(ID) {
 		clientID = ID;
 	});
   });
@@ -28,7 +29,7 @@ window.onkeydown = function(e) {
 	if (keynum == 'D'.charCodeAt(0))
 		cursors.right.isDown = true;
 	
-	server.emit('input_event', clientID, cursors);
+	server.emit('input_event', clientID, keyword, cursors);
 }
 
 
@@ -52,5 +53,5 @@ window.onkeyup = function(e) {
 	if (keynum == 'D'.charCodeAt(0))
 		cursors.right.isDown = false;
 	
-	server.emit('input_event', clientID, cursors);
+	server.emit('input_event', clientID, keyword, cursors);
 }

@@ -1,38 +1,32 @@
 var planetList;
-var usersConnected;
+var usersConnected = 0;
 var planetCount = 0;
 var server;
 var spacebar;
 var gameProgress;
+var windowWidth = window.innerWidth;
+var windowHeight = window.innerHeight;
+var keyword = 'default_keyword';
+var startRadius = 32;
+
 var Progress = {
 	WAITING: 0,
 	RUNNING: 1,
 	FINISHED: 2
 }
 var waitText, endText;
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gravity-game', GameState);
+var game = new Phaser.Game(windowWidth, windowHeight, Phaser.AUTO, 'gravity-game', GameState);
 
-var Planet = function (radius, imgName, tint, x, y) {
+var Planet = function (radius, imgName, tint, x, y, id) {
 	this.input = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};	
 	
+	this.id = id;
+	this.tint = tint;
 	this.exists = true;
 	this.radius = radius;
 	
-	this.sprite = game.add.sprite(x, y, imgName);
-	this.sprite.tint = tint;
 	
-	// Setup physics for the planet
-	game.physics.p2.enableBody(this.sprite);
-	
-	// This is used in collision detection.
-	this.sprite.body.planet = this;
-	
-	// Maps planets to the number of frames we've been touching them. -1 if we're not.
-	this.touching = new Array();
-	
-	this.sprite.body.onBeginContact.add(this.onBeginContact, this);
-	this.sprite.body.onEndContact.add(this.onEndContact, this);
-	
+	this.spriteAndPhysics(imgName, x, y);
 
 	this.resize();
 	
@@ -41,30 +35,61 @@ var Planet = function (radius, imgName, tint, x, y) {
 	
 }
 
+Planet.prototype.spriteAndPhysics = function (imgName, x, y) {
+	this.sprite = game.add.sprite(x, y, imgName);
+	this.sprite.tint = this.tint;
+	
+	// Setup physics for the planet
+	game.physics.p2.enableBody(this.sprite);
+	
+	// This is used in collision detection.
+	this.sprite.body.planet = this;
+	
+	// Maps planet index to the number of frames we've been siphoning off them. -1 if we're not.
+	this.siphoning = new Array();
+	
+	this.sprite.body.onBeginContact.add(this.onBeginContact, this);
+	this.sprite.body.onEndContact.add(this.onEndContact, this);
+}
+
 Planet.prototype.onBeginContact = function(body, shapeA, shapeB, equation) {
 	// We are touching another planet
-	if (body.planet && typeof body.planet === "planet")
-		this.touching[body.planet] = 0;
+	if (body && body.planet && body.planet.radius < this.radius)
+		this.siphoning[body.planet.id] = 0;
 }
 
 Planet.prototype.onEndContact = function(body, shapeA, shapeB, equation) {
 	// We are no longer touching another planet
-	if (body.planet && typeof body.planet === "planet")
-		this.touching[body.planet] = -1;
+	if (body && body.planet)
+		this.siphoning[body.planet.id] = -1;
 } 
 
 Planet.prototype.kill = function() {
 	this.exists = false;
+	--planetCount;
 	this.sprite.kill();
 }
 
-Planet.prototype.shrink = function(amount) {
-	this.radius -= amount;
+Planet.prototype.ressurect = function() {
+	this.exists = true;
+	++planetCount;
+	// Kill the sprite if we haven't.
+	if (this.sprite)
+		this.sprite.kill();
+	this.radius = startRadius;
+	this.spriteAndPhysics('planet', game.rnd.between(startRadius, windowWidth - startRadius), game.rnd.between(startRadius, windowHeight - startRadius));
+}
+
+Planet.prototype.shrink = function() {
+	var change = Math.ceil(this.radius / 3);
+	this.radius -= change;
 	if (this.radius <= 0)
 		this.kill();
 	else {
 		this.resize();
 	}
+	
+	return change;
 }
 
 // Resets the sprite and body to match the radius.
@@ -82,11 +107,14 @@ Planet.prototype.grow = function(amount) {
 function GameState() {}
 
 GameState.prototype.preload = function(){
+	game.load.image('stars', 'assets/starfield.png');
 	game.load.image('planet', 'assets/PlanetsTexture.png');
 }
 
 GameState.prototype.create = function(){
   game.physics.startSystem(Phaser.Physics.P2JS);
+  
+  game.add.tileSprite(0,0, windowWidth, windowHeight,'stars'); 
   
   setupGame();
 	
@@ -100,14 +128,14 @@ GameState.prototype.create = function(){
   // When we connect to the server
   server.on('connect', function() {
 	console.log('Connected to server.');
-	server.emit('startup_host');
+	server.emit('startup_host', keyword);
   });
   	  
 	// If a client connects, add a planet to the screen.
 	server.on('add_planet', function (clientID) {
 		console.log('New Client');
 		if (gameProgress == Progress.WAITING) {
-			planetList[clientID] = new Planet(32, 'planet', 0x0000ff, game.world.centerX, game.world.centerY);
+			planetList[clientID] = new Planet(startRadius, 'planet', 0x0000ff, game.rnd.between(startRadius, windowWidth - startRadius), game.rnd.between(startRadius, windowHeight - startRadius, clientID), clientID);
 			++planetCount;
 			++usersConnected;
 		}
@@ -115,9 +143,20 @@ GameState.prototype.create = function(){
 	
 	// If we get an input event, move the planet accordingly.
 	server.on('move_planet', function (clientID, input) {
-		console.log(input);
+		console.log('input event');
 		if (planetList[clientID])
 			planetList[clientID].input = input;
+	});
+	
+	server.on('remove_planet', function (clientID) {
+		console.log('remove client');
+		if (planetList[clientID]) {
+			planetList[clientID].kill();
+			planetList[clientID] = 0;
+			--usersConnected;
+			--planetCount;
+		}
+			
 	});
 }
 
@@ -134,8 +173,24 @@ GameState.prototype.update = function(){
 		resetGame();
 							
 	planetList.forEach(function(planet) {
-		if (planet)
+		if (planet) {
+			// Move this planet.
 			movePlanet(planet);
+			// For each planet we may/may not be siphoning off of
+			for (var id in planet.siphoning) {
+				if (id === 'length' || !planet.siphoning.hasOwnProperty(id)) continue;
+				
+				if (planet.siphoning[id] == 0) {
+					planet.grow(planetList[id].shrink());
+				}
+				else if (planet.siphoning[id] < 0) {
+					// Do nothing.
+				}
+				else {
+					++planet.siphoning[id];
+				}
+			}
+		}
 	});
 }
 
@@ -160,7 +215,7 @@ GameState.prototype.render = function(){}
 function setupGame() {
 	gameProgress = Progress.WAITING;
 	planetList = new Array();
-	planetCount = 0;
+	planetCount = usersConnected;
 	// Put up the "Wait to start" text
 	var style = { font: "65px Arial", fill: "#ffffff", align: "center" };
 	waitText = game.add.text(game.world.centerX, game.world.centerY, "Waiting for players...\nPress SPACE to start", style);
@@ -192,8 +247,12 @@ function resetGame() {
 	console.log("Game Reset.");
 	// Remove the "Game over" text
 	endText.destroy();
-
-	// Kick everyone off
+	
+	// Ressurect everyone.
+	planetList.forEach(function (planet) {
+		if (planet)
+			planet.ressurect();
+	});
 	
 	// Setup the game again.
 	setupGame();
