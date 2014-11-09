@@ -33,9 +33,13 @@ io.sockets.on('connection', function(socket) {
 		console.log('Client trys to join with "' + keyword + '"');
 		if (io.hosts[keyword]) {
 			console.log('Client added to host with "' + keyword + '" and ID '+nextID);
-			io.hosts[keyword].emit('add_planet', nextID);
+			// TODO - Move this somewhere better
+			// Generate a random color
+			var color = Math.floor(Math.random() * 14000);
+			io.hosts[keyword].emit('add_planet', nextID, color);
+			
 			socket.clientID = nextID;
-			callback(nextID);
+			callback(nextID, color);
 			++nextID;
 		}
 		else {
