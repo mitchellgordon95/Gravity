@@ -136,7 +136,7 @@ GameState.prototype.create = function(){
 
   //player.body.collideWorldBounds = true;
 
-  server = io.connect('http://localhost:4000');
+  server = io.connect('http://localhost');
 
   // When we connect to the server
   server.on('connect', function() {
