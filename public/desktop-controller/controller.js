@@ -7,10 +7,9 @@
 		clientID = ID;
 	});
   });
-
-var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
 	
 window.onkeydown = function(e) {
+	var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
 	var keynum;
 
 	if(window.event){ // IE					
@@ -34,6 +33,7 @@ window.onkeydown = function(e) {
 
 
 window.onkeyup = function(e) {
+	var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
 	var keynum;
 
 	if(window.event){ // IE					

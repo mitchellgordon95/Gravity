@@ -62,18 +62,19 @@ GameState.prototype.create = function(){
 
 GameState.prototype.update = function(){
 	for (var i = 0; i < planetList.length; ++i)
-		movePlanet(planetList[i]);
+		if (planetList[i])
+			movePlanet(planetList[i]);
 }
 
 function movePlanet(planet){
   if (planet.input.type == "cursors") {
-	  var cursors = planet.cursors;
-	  if (cursors.left.isDown) {planet.sprite.body.force.x = -100;}   //player.sprite movement
-	  else if (cursors.right.isDown){planet.sprite.body.force.x = 100;}
+	  var cursors = planet.input;
+	  if (cursors.left.isDown) {planet.sprite.body.force.x = -400;}  
+	  else if (cursors.right.isDown){planet.sprite.body.force.x = 400;}
 	  else {planet.sprite.body.force.x = 0;}
 	  
-	  if (cursors.up.isDown){planet.sprite.body.force.y = -100;}
-	  else if (cursors.down.isDown){planet.sprite.body.force.y = 100;}
+	  if (cursors.up.isDown){planet.sprite.body.force.y = -400;}
+	  else if (cursors.down.isDown){planet.sprite.body.force.y = 400;}
 	  else {planet.sprite.body.force.y = 0;}
 	}
 	else if (planet.input.type == "tilt") {

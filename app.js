@@ -20,6 +20,7 @@ io.sockets.on('connection', function(socket) {
 	socket.on('client_join', function (callback) {
 		console.log('Client joins.');
 		if (io.host) {
+			console.log('Adding planet.');
 			io.host.emit('add_planet', nextID);
 			callback(nextID);
 			++nextID;
