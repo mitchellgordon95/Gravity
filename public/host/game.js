@@ -18,36 +18,36 @@ var waitText, endText;
 var game = new Phaser.Game(windowWidth, windowHeight, Phaser.AUTO, 'gravity-game', GameState);
 
 var Planet = function (radius, imgName, tint, x, y, id) {
-	this.input = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};	
-	
+	this.input = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
+
 	this.id = id;
 	this.tint = tint;
 	this.exists = true;
 	this.radius = radius;
-	
-	
+
+
 	this.spriteAndPhysics(imgName, x, y);
 
 	this.resize();
-	
+
 	// Wrap the sprite around the world.
 	game.world.wrap(this.sprite);
-	
+
 }
 
 Planet.prototype.spriteAndPhysics = function (imgName, x, y) {
 	this.sprite = game.add.sprite(x, y, imgName);
 	this.sprite.tint = this.tint;
-	
+
 	// Setup physics for the planet
 	game.physics.p2.enableBody(this.sprite);
-	
+
 	// This is used in collision detection.
 	this.sprite.body.planet = this;
-	
+
 	// Maps planet index to the number of frames we've been siphoning off them. -1 if we're not.
 	this.siphoning = new Array();
-	
+
 	this.sprite.body.onBeginContact.add(this.onBeginContact, this);
 	this.sprite.body.onEndContact.add(this.onEndContact, this);
 }
@@ -62,7 +62,7 @@ Planet.prototype.onEndContact = function(body, shapeA, shapeB, equation) {
 	// We are no longer touching another planet
 	if (body && body.planet)
 		this.siphoning[body.planet.id] = -1;
-} 
+}
 
 Planet.prototype.kill = function() {
 	this.exists = false;
@@ -88,7 +88,7 @@ Planet.prototype.shrink = function() {
 	else {
 		this.resize();
 	}
-	
+
 	return change;
 }
 
@@ -113,24 +113,24 @@ GameState.prototype.preload = function(){
 
 GameState.prototype.create = function(){
   game.physics.startSystem(Phaser.Physics.P2JS);
-  
-  game.add.tileSprite(0,0, windowWidth, windowHeight,'stars'); 
-  
+
+  game.add.tileSprite(0,0, windowWidth, windowHeight,'stars');
+
   setupGame();
-	
+
   // Get the spacebar, which the user presses to start the game.
   spacebar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
   //player.body.collideWorldBounds = true;
-  
-  server = io.connect('http://localhost');
-  
+
+  server = io.connect('http://172.31.252.246:4000');
+
   // When we connect to the server
   server.on('connect', function() {
 	console.log('Connected to server.');
 	server.emit('startup_host', keyword);
   });
-  	  
+
 	// If a client connects, add a planet to the screen.
 	server.on('add_planet', function (clientID) {
 		console.log('New Client');
@@ -140,14 +140,14 @@ GameState.prototype.create = function(){
 			++usersConnected;
 		}
 	});
-	
+
 	// If we get an input event, move the planet accordingly.
 	server.on('move_planet', function (clientID, input) {
-		console.log('input event');
+		//console.log('input event');
 		if (planetList[clientID])
 			planetList[clientID].input = input;
 	});
-	
+
 	server.on('remove_planet', function (clientID) {
 		console.log('remove client');
 		if (planetList[clientID]) {
@@ -156,12 +156,12 @@ GameState.prototype.create = function(){
 			--usersConnected;
 			--planetCount;
 		}
-			
+
 	});
 }
 
 GameState.prototype.update = function(){
-	
+
 	// If the game hasn't started, wait for the space bar to start
 	if (gameProgress == Progress.WAITING && spacebar.isDown)
 		startGame();
@@ -171,7 +171,7 @@ GameState.prototype.update = function(){
 	// If the game has ended, wait for the space bar to restart
 	if (gameProgress == Progress.FINISHED && spacebar.isDown)
 		resetGame();
-							
+
 	planetList.forEach(function(planet) {
 		if (planet) {
 			// Move this planet.
@@ -179,7 +179,7 @@ GameState.prototype.update = function(){
 			// For each planet we may/may not be siphoning off of
 			for (var id in planet.siphoning) {
 				if (id === 'length' || !planet.siphoning.hasOwnProperty(id)) continue;
-				
+
 				if (planet.siphoning[id] == 0) {
 					planet.grow(planetList[id].shrink());
 				}
@@ -197,16 +197,16 @@ GameState.prototype.update = function(){
 function movePlanet(planet){
   if (planet.input.type == "cursors") {
 	  var cursors = planet.input;
-	  if (cursors.left.isDown) {planet.sprite.body.force.x = -400;}  
+	  if (cursors.left.isDown) {planet.sprite.body.force.x = -400;}
 	  else if (cursors.right.isDown){planet.sprite.body.force.x = 400;}
 	  else {planet.sprite.body.force.x = 0;}
-	  
+
 	  if (cursors.up.isDown){planet.sprite.body.force.y = -400;}
 	  else if (cursors.down.isDown){planet.sprite.body.force.y = 400;}
 	  else {planet.sprite.body.force.y = 0;}
 	}
 	else if (planet.input.type == "tilt") {
-		
+
 	}
 }
 
@@ -236,25 +236,24 @@ function isGameOver() {
 function endGame() {
 	console.log("Game Ended.");
 	gameProgress = Progress.FINISHED;
-	
+
 	// Put up the "Game over" text
 	var style = { font: "65px Arial", fill: "#ffffff", align: "center" };
 	endText = game.add.text(game.world.centerX, game.world.centerY, "Game Over. Player X wins.\nPress SPACE to restart", style);
-	endText.anchor.set(0.5);	
+	endText.anchor.set(0.5);
 }
 
 function resetGame() {
 	console.log("Game Reset.");
 	// Remove the "Game over" text
 	endText.destroy();
-	
+
 	// Ressurect everyone.
 	planetList.forEach(function (planet) {
 		if (planet)
 			planet.ressurect();
 	});
-	
+
 	// Setup the game again.
 	setupGame();
 }
-

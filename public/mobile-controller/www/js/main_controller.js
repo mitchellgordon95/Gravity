@@ -5,13 +5,14 @@
     $scope.title = 'wifwoig';
     var server;
     var clientID;
+    var keyword = 'default_keyword';
     var cb = function() {
-      alert('cb')
+      //alert('cb')
       server = io.connect("http://172.31.252.246:4000");
       // When we connect to the server
       server.on('connect', function() {
         console.log('Connected to server.');
-        server.emit('client_join', function(ID) {
+        server.emit('client_join', keyword, function(ID) {
           clientID = ID;
         });
       });
@@ -36,7 +37,7 @@
         cursors.down.isDown = true;
       if (data.gamma > 5)
         cursors.right.isDown = true;
-      server.emit('input_event', clientID, cursors);
+      server.emit('input_event', clientID, keyword, cursors);
     });
   }]);
 })();

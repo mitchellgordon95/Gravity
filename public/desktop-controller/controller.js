@@ -1,12 +1,12 @@
-  server = io.connect("http://localhost");
+  server = io.connect("http://172.31.252.246:4000");
   var clientID;
   var keyword = 'default_keyword';
   // When we connect to the server
   server.on('connect', function() {
-	console.log('Connected to server.');
-	server.emit('client_join', keyword, function(ID) {
-		clientID = ID;
-	});
+	  console.log('Connected to server.');
+	  server.emit('client_join', keyword, function(ID) {
+		  clientID = ID;
+	  });
   });
 
 window.onkeydown = function(e) {

@@ -51,7 +51,7 @@ io.sockets.on('connection', function(socket) {
 	});
 	// When a client moves, tell the host to update its position.
 	socket.on('input_event', function(clientID, keyword, input) {
-		console.log('input_event');
+		console.log(input);
 		if (io.hosts[keyword])
 			io.hosts[keyword].emit('move_planet', clientID, input);
 	});
