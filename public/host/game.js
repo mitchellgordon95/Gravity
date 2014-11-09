@@ -84,16 +84,18 @@ Planet.prototype.ressurect = function() {
 	this.spriteAndPhysics('planet', randomX(), randomY());
 }
 
+var siphonConstant = 0.3;
+
 Planet.prototype.shrink = function() {
-	var change = Math.ceil(this.radius / 3);
-	this.radius -= change;
-	if (this.radius <= 0)
+	var old = this.radius;
+	this.radius = Math.sqrt(Math.pow(this.radius, 2) * siphonConstant);
+	if (this.radius <= 15)
 		this.kill();
 	else {
 		this.resize();
 	}
 
-	return change;
+	return old;
 }
 
 // Resets the sprite and body to match the radius.
@@ -102,8 +104,8 @@ Planet.prototype.resize = function() {
 	this.sprite.body.setCircle(this.radius, 0, 0, 0);
 }
 
-Planet.prototype.grow = function(amount) {
-	this.radius += amount;
+Planet.prototype.grow = function(otherRadius) {
+	this.radius = Math.sqrt(Math.pow(this.radius, 2) + siphonConstant * Math.pow(otherRadius, 2));
 	this.resize();
 }
 
