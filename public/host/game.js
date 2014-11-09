@@ -1,6 +1,7 @@
 var player;
 var planetList;
 var planetGroup;
+var server;
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', GameState);
 
 var Planet = function (radius, imgName, x, y) {
@@ -33,11 +34,9 @@ GameState.prototype.create = function(){
   
   planetList = new Array();
   
-  planetList[0] = player;
-  planetList[1] = new Planet(32, 'planet', game.world.centerX, game.world.centerY);
+  planetList.push(player);
 
   //player.body.collideWorldBounds = true;
-  //player.body.gravity.y = 900;
 
   // Create a group for all the planets
   planetGroup = game.add.group();
@@ -48,6 +47,26 @@ GameState.prototype.create = function(){
   cursors = game.input.keyboard.createCursorKeys();
   jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
   
+  server = io.connect('http://localhost');
+  
+  // When we connect to the server
+  server.on('connect', function() {
+	console.log('Connected to server.');
+	server.emit('startup_host');
+  });
+  	  
+	// If a client connects, add a planet to the screen.
+	server.on('add_planet', function (clientID) {
+		console.log('New Client');
+		planetList[clientID] = new Planet(32, 'planet', game.world.centerX, game.world.centerY);
+	});
+	
+	// If we get an input event, move the planet accordingly.
+	server.on('input_event', function (clientID, input) {
+		console.log('Input Event');
+		if (!typeof planetList[clientID] === 'undefined')
+			movePlanet(planetList[clientID], input);
+	});
 }
 
 GameState.prototype.update = function(){
