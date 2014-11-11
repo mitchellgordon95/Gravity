@@ -1,14 +1,13 @@
-  server = io.connect("http://10.66.40.149");
+  server = io.connect("http://127.0.0.1");
   var clientID;
-  var color;
   var keyword = 'default_keyword';
   // When we connect to the server
   server.on('connect', function() {
 	  console.log('Connected to server.');
-	  server.emit('client_join', keyword, function(ID, mColor) {
+	  server.emit('client_join', keyword, function(ID, color) {
 		  clientID = ID;
-		  color = mColor;
-		  document.body.style.backgroundColor = "#" + mColor.toString(16);
+		  document.body.style.backgroundColor = "#" + color.toString(16);
+		  console.log('Joined game with ID ' + ID + ' and color ' + color.toString(16);
 	  });
   });
 
