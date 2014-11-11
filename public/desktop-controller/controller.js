@@ -1,4 +1,4 @@
-  server = io.connect("http://172.31.252.190");
+  server = io.connect("http://10.66.40.149");
   var clientID;
   var color;
   var keyword = 'default_keyword';
