@@ -3,7 +3,7 @@ var server;
 var clientID;
 var keyword = 'default_keyword';
 
-server = io.connect("http://10.66.40.149");
+server = io.connect("http://10.66.216.101");
 // When we connect to the server
 server.on('connect', function() {
 console.log('Connected to server.');
