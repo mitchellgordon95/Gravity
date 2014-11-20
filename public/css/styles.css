@@ -11,8 +11,7 @@ body {
 
 #title {
 	width: 40%;
-	margin-top: 5%;
-	margin-left: 5%;
+	margin: 5%;
     text-align:left;
 }
 
@@ -21,8 +20,8 @@ body {
 	color: white;
 }
 
-/* Each child in content should have a certain margin */
+/* Each child in content should have a certain padding */
 #content * {
-	margin: 5%;
+	margin-bottom: 5%;
 }
 
