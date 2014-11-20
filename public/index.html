@@ -12,12 +12,22 @@
 	<body>
 		<img id="title" src="images/title.png">
 		<div id="content">
-			<form name="input" action="/desktop-controller" method="get" id="input">
-			Keyword: <input type="text" name="keyword" id="keyword"><br>
-			<input type="submit" value="Join a Game" class="button" ><br>
-			</form>
+			Keyword: <input type="text" name="keyword" id="keyword"></br>
+			<button id="join_game" class="button">Join a Game</button></br>
+			<button id="create_game" class="button">Create a Game</button></br>
 			<a href="mobile-controller.apk" class="button" >ANDROID USERS:
 			Download App</a>
 		</div>
+		<script type="text/javascript">
+			var keyword = document.getElementById('keyword');
+			
+			document.getElementById('join_game').onclick = function () {
+				window.location = '/desktop-controller#' + keyword.value;
+			}
+			
+			document.getElementById('create_game').onclick = function () {
+				window.location = '/host#' + keyword.value;
+			}
+		</script>
 	</body>
 </html>
