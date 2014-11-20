@@ -8,32 +8,16 @@
 		</title>
 		<meta name="author" content="H@ck Nashville 6">
 		<link href="css/styles.css" rel="stylesheet" type="text/css">
-		<link href="js/jquery-ui.css" rel="stylesheet" type="text/css">
-		<script src="js/external/jquery/jquery.js" type="text/javascript"></script>
-		<script src="js/jquery-ui.min.js" type="text/javascript"></script>
 	</head>
-	<body id="home">
-		<div class="fullscreen background" style="background-image:url('images/splash-1024.jpg');" data-img-width="1024" data-img-height="640">
-			<div class="content-a">
-				<div class="content-b">
-					<h1>
-						Gravity
-					</h1>
-					<div class="content-c">
-						<div class="content-d">
-							<form name="input" action="/desktop-controller" method="get" id="input">
-							Keyword: <input type="text" name="keyword" id="keyword"><br>
-							<input type="submit" value="Join a Game" class="button" ><br>
-							</form>
-							<a href="mobile-controller.apk" class="button" >ANDROID USERS:
-							Download App</a>
-						</div>
-					</div>
-				</div>
-			</div><script type="text/javascript" src="js/fullscreenBG.js">
-</script><script type="text/javascript">
-$( ".button" ).button();
-			</script>
+	<body>
+		<img id="title" src="images/title.png">
+		<div id="content">
+			<form name="input" action="/desktop-controller" method="get" id="input">
+			Keyword: <input type="text" name="keyword" id="keyword"><br>
+			<input type="submit" value="Join a Game" class="button" ><br>
+			</form>
+			<a href="mobile-controller.apk" class="button" >ANDROID USERS:
+			Download App</a>
 		</div>
 	</body>
 </html>
