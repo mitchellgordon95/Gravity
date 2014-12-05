@@ -7,7 +7,7 @@ var gameProgress;
 var windowWidth = window.innerWidth;
 var windowHeight = window.innerHeight;
 var asteroidGroup, asteroidSpawnCounter = 0, asteroidRand;
-var keyword = 'default_keyword';
+var keyword = window.location.hash.substring(1);
 var startRadius = 32;
 
 var Progress = {
