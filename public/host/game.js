@@ -1,4 +1,4 @@
-var planetList;
+var planetList = [];
 var usersConnected = 0;
 var planetCount = 0;
 var server;
@@ -6,7 +6,7 @@ var spacebar;
 var gameProgress;
 var windowWidth = window.innerWidth;
 var windowHeight = window.innerHeight;
-var asteroidGroup, asteroidSpawnCounter = 0, asteroidRand;
+var asteroidList = [], asteroidSpawnCounter = 0, asteroidRand;
 var keyword = window.location.hash.substring(1);
 var startRadius = 32;
 
@@ -68,10 +68,10 @@ Planet.prototype.onEndContact = function(body, shapeA, shapeB, equation) {
 		this.siphoning[body.planet.id] = -1;
 }
 
-Planet.prototype.kill = function() {
+Planet.prototype.destroy = function() {
 	this.exists = false;
 	--planetCount;
-	this.sprite.kill();
+	this.sprite.destroy();
 }
 
 Planet.prototype.grow = function (amount) {
@@ -82,11 +82,12 @@ Planet.prototype.grow = function (amount) {
 Planet.prototype.ressurect = function() {
 	this.exists = true;
 	++planetCount;
-	// Kill the sprite if we haven't.
+	// destroy the sprite if we haven't.
 	if (this.sprite)
-		this.sprite.kill();
+		this.sprite.destroy();
 	this.radius = startRadius;
 	this.spriteAndPhysics('planet', randomX(), randomY());
+	this.resize();
 }
 
 var siphonConstant = 0.3;
@@ -104,9 +105,9 @@ Planet.prototype.siphon = function(other) {
 	// Shrink them
 	other.radius = Math.sqrt(Math.pow(other.radius, 2) * siphonConstant);
 
-	// If they're small enough, kill them.
+	// If they're small enough, destroy them.
 	if (other.radius <= 15)
-		other.kill();
+		other.destroy();
 	else {
 		other.resize();
 	}
@@ -164,7 +165,7 @@ GameState.prototype.create = function(){
 	server.on('remove_planet', function (clientID) {
 		console.log('remove client');
 		if (planetList[clientID]) {
-			planetList[clientID].kill();
+			planetList[clientID].destroy();
 			planetList[clientID] = 0;
 			--usersConnected;
 			--planetCount;
@@ -192,6 +193,8 @@ GameState.prototype.update = function(){
 			asteroid.body.angularVelocity = 2;
 			// This is used in collision detection.
 			asteroid.body.asteroid = asteroid;
+			// Keep track of all asteroids so we can kill them all at the end.
+			asteroidList.push(asteroid);
 		}
 		// Increment it until it reaches a random value
 		asteroidSpawnCounter = (asteroidSpawnCounter + 1) % asteroidRand;
@@ -201,7 +204,7 @@ GameState.prototype.update = function(){
 		resetGame();
 
 	planetList.forEach(function(planet) {
-		if (planet) {
+		if (planet && planet.exists) {
 			// Move this planet.
 			movePlanet(planet);
 			// For each planet we may/may not be siphoning off of
@@ -242,7 +245,7 @@ GameState.prototype.render = function(){}
 
 function setupGame() {
 	gameProgress = Progress.WAITING;
-	planetList = new Array();
+	
 	planetCount = usersConnected;
 	// Put up the "Wait to start" text
 	var style = { font: "65px Arial", fill: "#ffffff", align: "center" };
@@ -281,6 +284,13 @@ function resetGame() {
 		if (planet)
 			planet.ressurect();
 	});
+	
+	// Destroy all asteroids and reinitialize the array
+	asteroidList.forEach(function(asteroid) {
+		asteroid.kill();
+	});
+	
+	asteroidList = [];
 
 	// Setup the game again.
 	setupGame();
