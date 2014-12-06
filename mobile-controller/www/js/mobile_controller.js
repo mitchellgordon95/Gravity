@@ -55,4 +55,4 @@ window.addEventListener('deviceorientation', function(data){
 		return;
 		
 	server.emit('input_event', clientID, keyword, cursors);
-});
+}, true);
