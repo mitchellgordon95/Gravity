@@ -6,6 +6,12 @@
   server.on('connect', function() {
 	  console.log('Connected to server.');
 	  server.emit('client_join', keyword, function(ID, color) {
+		  // If we failed, it's probably because the keyword isn't being used
+		  if (ID == -1) {
+			alert("Sorry, no games with that keyword exist.");
+			window.location.href = "/";
+		  }
+			
 		  clientID = ID;
 		  document.body.style.backgroundColor = "#" + color.toString(16);
 		  document.getElementById("clientID").innerHTML = "You are Player " + clientID;
@@ -112,4 +118,4 @@ window.addEventListener('deviceorientation', function(data){
 		return;
 		
 	server.emit('input_event', clientID, keyword, cursors);
-});
+}, true);
