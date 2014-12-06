@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/www'));
 var io = require('socket.io')(server);
 
 server.listen(80);
@@ -15,10 +15,18 @@ io.sockets.on('connection', function(socket) {
 	console.log('connection');
 
 	// This socket is a host.
-	socket.on('startup_host', function (keyword) {
+	socket.on('startup_host', function (keyword, callback) {
 		if (keyword) {
 			console.log('Host connected with "' + keyword + '"');
+			
+			// If a host is already using this keyword, return no success
+			if (io.hosts[keyword]) {
+				callback({ });
+				return;
+			}
+			
 			io.hosts[keyword] = socket;
+			callback({success: true});
 
 			// When the host disconnects,
 			socket.on('disconnect', function () {

@@ -142,7 +142,22 @@ GameState.prototype.create = function(){
   // When we connect to the server
   server.on('connect', function() {
 	console.log('Connected to server.');
-	server.emit('startup_host', keyword);
+	server.emit('startup_host', keyword, function(result) {
+		if (result.success) {
+			//CONTROLLER
+			//Let's the host control a planet on screen.
+			server.emit('client_join', keyword, function(ID, color) {
+				clientID = ID;
+				console.log('Joined game with ID ' + ID + ' and color ' + color.toString(16));
+			});
+		}
+		// If we weren't successful, it's probably because someone is already using our keyword.
+		else {
+			alert("Sorry, that keyword is in use. Maybe try joining instead?");
+			window.location.href = "/";
+		}
+	});
+	
   });
 
 	// If a client connects, add a planet to the screen.
@@ -268,9 +283,17 @@ function endGame() {
 	console.log("Game Ended.");
 	gameProgress = Progress.FINISHED;
 
+	var winner;
+	// Figure out which player won.
+	planetList.forEach(function(planet, index) {
+		if (planet && planet.exists) {
+			winner = index;
+		}
+	});
+	
 	// Put up the "Game over" text
 	var style = { font: "65px Arial", fill: "#ffffff", align: "center" };
-	endText = game.add.text(game.world.centerX, game.world.centerY, "Game Over. Player X wins.\nPress SPACE to restart", style);
+	endText = game.add.text(game.world.centerX, game.world.centerY, "Game Over. Player " + winner + " wins.\nPress SPACE to restart", style);
 	endText.anchor.set(0.5);
 }
 
@@ -302,4 +325,68 @@ function randomX() {
 
 function randomY() {
 	return game.rnd.between(startRadius, windowHeight - startRadius);
+}
+
+/**
+* This block lets the host control a planet on screen. To disable this, you must also remove the line tagged with CONTROLLER above
+*/
+var clientID;
+var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
+
+window.onkeydown = function(e) {
+	var keynum;
+
+	if(window.event){ // IE
+		keynum = e.keyCode;
+	}
+	else if(e.which){ // Netscape/Firefox/Opera
+			keynum = e.which;
+		 }
+		 
+	var changed = false;
+	// Setup cursors properly based on which key was pressed 
+	if (keynum == 'W'.charCodeAt(0)) {
+		changed = changed || !cursors.up.isDown;
+		cursors.up.isDown = true;
+	}
+	if (keynum == 'A'.charCodeAt(0)) {
+		changed = changed || !cursors.left.isDown;
+		cursors.left.isDown = true;
+	}
+	if (keynum == 'S'.charCodeAt(0)) {
+		changed = changed || !cursors.down.isDown;
+		cursors.down.isDown = true;
+	}
+	if (keynum == 'D'.charCodeAt(0)) {
+		changed = changed || !cursors.right.isDown;
+		cursors.right.isDown = true;
+	}
+
+	if (!changed)
+		return;
+	
+	server.emit('input_event', clientID, keyword, cursors);
+}
+
+
+window.onkeyup = function(e) {
+	var keynum;
+
+	if(window.event){ // IE
+		keynum = e.keyCode;
+	}else
+		if(e.which){ // Netscape/Firefox/Opera
+			keynum = e.which;
+		 }
+
+	if (keynum == 'W'.charCodeAt(0))
+		cursors.up.isDown = false;
+	if (keynum == 'A'.charCodeAt(0))
+		cursors.left.isDown = false;
+	if (keynum == 'S'.charCodeAt(0))
+		cursors.down.isDown = false;
+	if (keynum == 'D'.charCodeAt(0))
+		cursors.right.isDown = false;
+
+	server.emit('input_event', clientID, keyword, cursors);
 }

@@ -1,19 +1,19 @@
   server = io.connect(window.location.host);
   var clientID;
   var keyword = window.location.hash.substring(1);
-  var lastCursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
+  var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
   // When we connect to the server
   server.on('connect', function() {
 	  console.log('Connected to server.');
 	  server.emit('client_join', keyword, function(ID, color) {
 		  clientID = ID;
 		  document.body.style.backgroundColor = "#" + color.toString(16);
+		  document.getElementById("clientID").innerHTML = "You are Player " + clientID;
 		  console.log('Joined game with ID ' + ID + ' and color ' + color.toString(16));
 	  });
   });
 
 window.onkeydown = function(e) {
-	var cursors = lastCursors;
 	var keynum;
 
 	if(window.event){ // IE
@@ -23,36 +23,33 @@ window.onkeydown = function(e) {
 			keynum = e.which;
 		 }
 		 
-	// If the key is already down, just bail out.
-	// Otherwise, setup cursors properly and send it.
+	var changed = false;
+	// Setup cursors properly based on which key was pressed 
 	if (keynum == 'W'.charCodeAt(0)) {
-		if (cursors.up.isDown)
-			return;
+		changed = changed || !cursors.up.isDown;
 		cursors.up.isDown = true;
 	}
 	if (keynum == 'A'.charCodeAt(0)) {
-		if (cursors.left.isDown)
-			return;
+		changed = changed || !cursors.left.isDown;
 		cursors.left.isDown = true;
 	}
 	if (keynum == 'S'.charCodeAt(0)) {
-		if (cursors.down.isDown)
-			return;
+		changed = changed || !cursors.down.isDown;
 		cursors.down.isDown = true;
 	}
 	if (keynum == 'D'.charCodeAt(0)) {
-		if (cursors.right.isDown)
-			return;
+		changed = changed || !cursors.right.isDown;
 		cursors.right.isDown = true;
 	}
 
-	lastCursors = cursors;
+	if (!changed)
+		return;
+	
 	server.emit('input_event', clientID, keyword, cursors);
 }
 
 
 window.onkeyup = function(e) {
-	var cursors = lastCursors;
 	var keynum;
 
 	if(window.event){ // IE
@@ -71,6 +68,48 @@ window.onkeyup = function(e) {
 	if (keynum == 'D'.charCodeAt(0))
 		cursors.right.isDown = false;
 
-	lastCursors = cursors;
 	server.emit('input_event', clientID, keyword, cursors);
 }
+
+// For tilt support
+window.addEventListener('deviceorientation', function(data){
+
+	var changed = false;
+	if (data.beta < -5) {
+		changed = changed || !cursors.up.isDown;
+		cursors.up.isDown = true;
+	}
+	else {	
+		changed = changed || cursors.up.isDown;
+		cursors.up.isDown = false;	
+	}
+	if (data.gamma < -5) {
+		changed = changed || !cursors.left.isDown;
+		cursors.left.isDown = true;
+	}
+	else {	
+		changed = changed || cursors.left.isDown;
+		cursors.left.isDown = false;	
+	}
+	if (data.beta > 5) {
+		changed = changed || !cursors.down.isDown;
+		cursors.down.isDown = true;
+	}
+	else {	
+		changed = changed || cursors.down.isDown;
+		cursors.down.isDown = false;	
+	}
+	if (data.gamma > 5) {
+		changed = changed || !cursors.right.isDown;
+		cursors.right.isDown = true;
+	}
+	else {	
+		changed = changed || cursors.right.isDown;
+		cursors.right.isDown = false;	
+	}
+
+	if (!changed)
+		return;
+		
+	server.emit('input_event', clientID, keyword, cursors);
+});
