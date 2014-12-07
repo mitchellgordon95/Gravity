@@ -1,10 +1,26 @@
 
-var server;
-var clientID;
-var keyword = window.location.hash.substring(1);
-var lastCursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
-
 server = io.connect("http://mitchellgordon.net:8080");
+
+var clientID;
+var tilt_output = document.getElementById("tilt_output");
+var keyword = window.location.hash.substring(1);
+var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
+// When we connect to the server
+server.on('connect', function() {
+  console.log('Connected to server.');
+  server.emit('client_join', keyword, function(ID, color) {
+	  // If we failed, it's probably because the keyword isn't being used
+	  if (ID == -1) {
+		alert("Sorry, no games with that keyword exist.");
+		window.location.href = "/";
+	  }
+		
+	  clientID = ID;
+	  document.body.style.backgroundColor = "#" + color.toString(16);
+	  document.getElementById("clientID").innerHTML = "You are Player " + clientID;
+	  console.log('Joined game with ID ' + ID + ' and color ' + color.toString(16));
+  });
+});
 // When we connect to the server
 server.on('connect', function() {
 console.log('Connected to server.');

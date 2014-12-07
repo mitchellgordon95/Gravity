@@ -1,24 +1,24 @@
-  server = io.connect(window.location.host);
-  var clientID;
-  var tilt_output = document.getElementById("tilt_output");
-  var keyword = window.location.hash.substring(1);
-  var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
-  // When we connect to the server
-  server.on('connect', function() {
-	  console.log('Connected to server.');
-	  server.emit('client_join', keyword, function(ID, color) {
-		  // If we failed, it's probably because the keyword isn't being used
-		  if (ID == -1) {
-			alert("Sorry, no games with that keyword exist.");
-			window.location.href = "/";
-		  }
-			
-		  clientID = ID;
-		  document.body.style.backgroundColor = "#" + color.toString(16);
-		  document.getElementById("clientID").innerHTML = "You are Player " + clientID;
-		  console.log('Joined game with ID ' + ID + ' and color ' + color.toString(16));
-	  });
+server = io.connect(window.location.host);
+var clientID;
+var tilt_output = document.getElementById("tilt_output");
+var keyword = window.location.hash.substring(1);
+var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
+// When we connect to the server
+server.on('connect', function() {
+  console.log('Connected to server.');
+  server.emit('client_join', keyword, function(ID, color) {
+	  // If we failed, it's probably because the keyword isn't being used
+	  if (ID == -1) {
+		alert("Sorry, no games with that keyword exist.");
+		window.location.href = "/";
+	  }
+		
+	  clientID = ID;
+	  document.body.style.backgroundColor = "#" + color.toString(16);
+	  document.getElementById("clientID").innerHTML = "You are Player " + clientID;
+	  console.log('Joined game with ID ' + ID + ' and color ' + color.toString(16));
   });
+});
 
 window.onkeydown = function(e) {
 	var keynum;
