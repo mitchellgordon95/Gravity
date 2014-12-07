@@ -40,7 +40,7 @@ io.sockets.on('connection', function(socket) {
 	socket.on('client_join', function (keyword, callback) {
 		//console.log('Client trys to join with "' + keyword + '"');
 		if (io.hosts[keyword]) {
-			console.log('Client added to host with "' + keyword + '" and ID '+nextID);
+			//console.log('Client added to host with "' + keyword + '" and ID '+nextID);
 			// TODO - Move this somewhere better
 			// Generate a random color
 			var color = Math.floor(Math.random() * 12000000 + 4000000);
