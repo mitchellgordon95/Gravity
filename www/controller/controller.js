@@ -81,7 +81,7 @@ window.onkeyup = function(e) {
 window.addEventListener('deviceorientation', function(data){
 
 	var changed = false;
-	if (data.beta < -5) {
+	if (data.beta < -10) {
 		changed = changed || !cursors.up.isDown;
 		cursors.up.isDown = true;
 	}
@@ -89,7 +89,7 @@ window.addEventListener('deviceorientation', function(data){
 		changed = changed || cursors.up.isDown;
 		cursors.up.isDown = false;	
 	}
-	if (data.gamma < -5) {
+	if (data.gamma < -10) {
 		changed = changed || !cursors.left.isDown;
 		cursors.left.isDown = true;
 	}
@@ -97,7 +97,7 @@ window.addEventListener('deviceorientation', function(data){
 		changed = changed || cursors.left.isDown;
 		cursors.left.isDown = false;	
 	}
-	if (data.beta > 5) {
+	if (data.beta > 10) {
 		changed = changed || !cursors.down.isDown;
 		cursors.down.isDown = true;
 	}
@@ -105,7 +105,7 @@ window.addEventListener('deviceorientation', function(data){
 		changed = changed || cursors.down.isDown;
 		cursors.down.isDown = false;	
 	}
-	if (data.gamma > 5) {
+	if (data.gamma > 10) {
 		changed = changed || !cursors.right.isDown;
 		cursors.right.isDown = true;
 	}

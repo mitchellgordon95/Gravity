@@ -1,10 +1,10 @@
 
 var server;
 var clientID;
-var keyword = 'default_keyword';
+var keyword = window.location.hash.substring(1);
 var lastCursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
 
-server = io.connect("http://10.66.216.101");
+server = io.connect("http://mitchellgordon.net:8080");
 // When we connect to the server
 server.on('connect', function() {
 console.log('Connected to server.');
@@ -18,7 +18,7 @@ server.emit('client_join', keyword, function(ID, color) {
 window.addEventListener('deviceorientation', function(data){
 
 	var changed = false;
-	if (data.beta < -5) {
+	if (data.beta < -10) {
 		changed = changed || !cursors.up.isDown;
 		cursors.up.isDown = true;
 	}
@@ -26,7 +26,7 @@ window.addEventListener('deviceorientation', function(data){
 		changed = changed || cursors.up.isDown;
 		cursors.up.isDown = false;	
 	}
-	if (data.gamma < -5) {
+	if (data.gamma < -10) {
 		changed = changed || !cursors.left.isDown;
 		cursors.left.isDown = true;
 	}
@@ -34,7 +34,7 @@ window.addEventListener('deviceorientation', function(data){
 		changed = changed || cursors.left.isDown;
 		cursors.left.isDown = false;	
 	}
-	if (data.beta > 5) {
+	if (data.beta > 10) {
 		changed = changed || !cursors.down.isDown;
 		cursors.down.isDown = true;
 	}
@@ -42,7 +42,7 @@ window.addEventListener('deviceorientation', function(data){
 		changed = changed || cursors.down.isDown;
 		cursors.down.isDown = false;	
 	}
-	if (data.gamma > 5) {
+	if (data.gamma > 10) {
 		changed = changed || !cursors.right.isDown;
 		cursors.right.isDown = true;
 	}

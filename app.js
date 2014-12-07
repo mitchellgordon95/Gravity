@@ -4,7 +4,7 @@ var server = require('http').Server(app);
 app.use(express.static(__dirname + '/www'));
 var io = require('socket.io')(server);
 
-server.listen(80);
+server.listen(8080);
 
 // Assign ID's linearly
 var nextID = 0;
