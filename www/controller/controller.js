@@ -1,5 +1,6 @@
   server = io.connect(window.location.host);
   var clientID;
+  var tilt_output = document.getElementById("tilt_output");
   var keyword = window.location.hash.substring(1);
   var cursors = {type: "cursors", left: {isDown:false}, right: {isDown:false}, up: {isDown:false}, down: {isDown:false}};
   // When we connect to the server
@@ -89,14 +90,6 @@ window.addEventListener('deviceorientation', function(data){
 		changed = changed || cursors.up.isDown;
 		cursors.up.isDown = false;	
 	}
-	if (data.gamma < -10) {
-		changed = changed || !cursors.left.isDown;
-		cursors.left.isDown = true;
-	}
-	else {	
-		changed = changed || cursors.left.isDown;
-		cursors.left.isDown = false;	
-	}
 	if (data.beta > 10) {
 		changed = changed || !cursors.down.isDown;
 		cursors.down.isDown = true;
@@ -104,6 +97,14 @@ window.addEventListener('deviceorientation', function(data){
 	else {	
 		changed = changed || cursors.down.isDown;
 		cursors.down.isDown = false;	
+	}
+	if (data.gamma < -10) {
+		changed = changed || !cursors.left.isDown;
+		cursors.left.isDown = true;
+	}
+	else {	
+		changed = changed || cursors.left.isDown;
+		cursors.left.isDown = false;	
 	}
 	if (data.gamma > 10) {
 		changed = changed || !cursors.right.isDown;
@@ -113,6 +114,8 @@ window.addEventListener('deviceorientation', function(data){
 		changed = changed || cursors.right.isDown;
 		cursors.right.isDown = false;	
 	}
+	
+	tilt_output.innerHTML = "beta: " + data.beta + "</br>gamma: " + data.gamma;
 
 	if (!changed)
 		return;
