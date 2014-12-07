@@ -1,0 +1,19 @@
+@ECHO off
+WHERE npm
+IF %ERRORLEVEL% NEQ 0 (
+	ECHO Please install node.js and npm before running this script.
+	GOTO END 
+)
+ECHO Installing socket.io globally...
+call npm install -g socket.io
+ECHO Linking socket.io to the local project...
+call npm link socket.io
+ECHO Installing express...
+call npm install -g express
+ECHO Linking express to the local project...
+call npm link express
+ECHO Installing phonegap...
+call npm install -g phonegap
+ECHO Installing cordova...
+call npm install -g cordova
+:END
