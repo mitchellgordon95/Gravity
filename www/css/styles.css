@@ -2,12 +2,19 @@
 
 /* background setup */
 body {
-    background: url('../images/splash-1024.jpg') no-repeat fixed;
+    background: url('../images/splash-desktop.jpg') no-repeat fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
 }
+
+@media ( max-width: 320px ) {
+	body {
+		background: url('../images/splash-mobile.jpg') no-repeat fixed;
+    }
+}
+
 
 #title {
 	width: 40%;
@@ -24,4 +31,9 @@ body {
 #content * {
 	margin-bottom: 5%;
 }
+
+a {
+	color: white;
+}
+
 
