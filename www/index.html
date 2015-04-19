@@ -15,7 +15,7 @@
 		<img id="title" src="images/title.png">
 		<div id="content">
 			Keyword: <input type="text" name="keyword" id="keyword"></br>
-			<button id="join_game" class="button-primary">Join Game</button> or
+			<button id="join_game" class="button-primary">Join Game</button></br> 
 			<button id="create_game" class="button-primary">Create Game</button></br>
 			<button class="button-primary" ><a  href="mobile-controller.apk">ANDROID USERS:
 			Download App</a></button>
@@ -24,11 +24,21 @@
 			var keyword = document.getElementById('keyword');
 			
 			document.getElementById('join_game').onclick = function () {
-				window.location = '/controller#' + keyword.value;
+				if(keyword.value == "") {
+					alert("Please enter a keyword.");
+				}
+				else {	
+					window.location = '/controller#' + keyword.value;
+				}
 			}
 			
 			document.getElementById('create_game').onclick = function () {
-				window.location = '/host#' + keyword.value;
+				if(keyword.value == "") {
+					alert("Please enter a keyword.");
+				}
+				else {
+					window.location = '/host#' + keyword.value;
+				}
 			}
 		</script>
 	</body>
