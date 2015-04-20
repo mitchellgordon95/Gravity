@@ -252,7 +252,8 @@ function movePlanet(planet){
 	  else {planet.sprite.body.force.y = 0;}
 	}
 	else if (planet.input.type == "tilt") {
-
+		planet.sprite.body.force.x = planet.input.beta * 20;
+		planet.sprite.body.force.y = -planet.input.gamma * 20;
 	}
 }
 

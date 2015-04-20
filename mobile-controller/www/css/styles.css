@@ -31,4 +31,12 @@ a {
 	color: white;
 }
 
+#controller {
+	display: none;
+}
+
+#clientID {
+	color: white;
+}
+
 
