@@ -36,6 +36,11 @@ document.getElementById('join_game').onclick = function () {
 						
 					server.emit('input_event', clientID, keyword, cursors);
 				}, true);
+				
+				// If they hit the back button, just reload the page.
+				document.getElementById('back_button').addEventListener("click", function (evt) {
+					document.location = "index.html";
+				});
 		  });
 		}
 		else {
