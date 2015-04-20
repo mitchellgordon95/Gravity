@@ -1,5 +1,10 @@
 #!/bin/bash
 command -v npm >/dev/null 2>&1 || { echo >&2 "npm not found. Please install node/npm."; exit 1; }
+# Make sure only root can run our script
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
 echo Installing socket.io...
 npm install -g socket.io
 echo Linking socket.io to the local project...
