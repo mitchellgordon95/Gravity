@@ -11,9 +11,7 @@ document.getElementById('join_game').onclick = function () {
 	}
 	else {
 		keyword = document.getElementById('keyword').value;
-		document.getElementById("content").style.display = "none";
-		document.getElementById("controller").style.display = "block";
-		document.getElementsByTagName("BODY")[0].style.backgroundImage = "none";
+		
 		
 		server = io.connect("http://gravity.mitchgordon.me");
 		
@@ -23,19 +21,24 @@ document.getElementById('join_game').onclick = function () {
 		  server.emit('client_join', keyword, function(ID, color) {
 			  // If we failed, it's probably because the keyword isn't being used
 			  if (ID == -1) {
-				alert("Sorry, no games with that keyword exist.");
-				document.getElementById("content").style.display = "block";
-				document.getElementById("controller").style.display = "none";
-				document.getElementsByTagName("BODY")[0].style.backgroundImage = "initial";
+				navigator.notification.alert("Sorry, no games with that keyword exist.", function(){});
 			  }
 				
 			  clientID = ID;
+			  document.getElementById("content").style.display = "none";
+			  document.getElementById("controller").style.display = "block";
+			  document.getElementsByTagName("BODY")[0].style.backgroundImage = "none";
 			  document.body.style.backgroundColor = "#" + color.toString(16);
 			  document.getElementById("clientID").innerHTML = "You are Player " + clientID;
 			  console.log('Joined game with ID ' + ID + ' and color ' + color.toString(16));
 		  });
 		});
 
+		// If we can't connect to the server
+		server.on('connect_error', function () {
+			navigator.notification.alert("Server connection error. Please try again later.", function(){});
+		});
+		
 		// For tilt support
 		window.addEventListener('deviceorientation', function(data){
 			
