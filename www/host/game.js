@@ -243,17 +243,17 @@ GameState.prototype.update = function(){
 function movePlanet(planet){
   if (planet.input.type == "cursors") {
 	  var cursors = planet.input;
-	  if (cursors.left.isDown) {planet.sprite.body.force.x = -400;}
-	  else if (cursors.right.isDown){planet.sprite.body.force.x = 400;}
+	  if (cursors.left.isDown) {planet.sprite.body.force.x = -12000 / planet.radius;}
+	  else if (cursors.right.isDown){planet.sprite.body.force.x = 12000 / planet.radius;}
 	  else {planet.sprite.body.force.x = 0;}
 
-	  if (cursors.up.isDown){planet.sprite.body.force.y = -400;}
-	  else if (cursors.down.isDown){planet.sprite.body.force.y = 400;}
-	  else {planet.sprite.body.force.y = 0;}
+	  if (cursors.up.isDown){planet.sprite.body.force.y = -12000 / planet.radius;}
+	  else if (cursors.down.isDown){planet.sprite.body.force.y = 12000 / planet.radius;}
+	  else {planet.sprite.body.force.y = 0;} 
 	}
 	else if (planet.input.type == "tilt") {
-		planet.sprite.body.force.x = planet.input.beta * 20;
-		planet.sprite.body.force.y = -planet.input.gamma * 20;
+		planet.sprite.body.force.x = planet.input.beta * 400 / planet.radius;
+		planet.sprite.body.force.y = -planet.input.gamma * 400 / planet.radius;
 	}
 }
 
