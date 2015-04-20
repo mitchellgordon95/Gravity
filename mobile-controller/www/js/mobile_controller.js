@@ -15,7 +15,7 @@ document.getElementById('join_game').onclick = function () {
 		document.getElementById("controller").style.display = "block";
 		document.getElementsByTagName("BODY")[0].style.backgroundImage = "none";
 		
-		server = io.connect("http://129.59.61.116:8080");
+		server = io.connect("http://gravity.mitchgordon.me");
 		
 		// When we connect to the server
 		server.on('connect', function() {
