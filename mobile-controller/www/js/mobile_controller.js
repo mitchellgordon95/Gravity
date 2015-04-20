@@ -22,6 +22,7 @@ document.getElementById('join_game').onclick = function () {
 			  // If we failed, it's probably because the keyword isn't being used
 			  if (ID == -1) {
 				navigator.notification.alert("Sorry, no games with that keyword exist.", function(){});
+				return;
 			  }
 				
 			  clientID = ID;
