@@ -6,6 +6,8 @@ var io = require('socket.io')(server);
 
 server.listen(80);
 
+console.log("Gravity server listening on port 80");
+
 // Assign ID's linearly
 var nextID = 0;
 
