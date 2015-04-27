@@ -241,20 +241,42 @@ GameState.prototype.update = function(){
 }
 
 function movePlanet(planet){
-  if (planet.input.type == "cursors") {
+	// Base movement force based on user input.
+	if (planet.input.type == "cursors") {
 	  var cursors = planet.input;
-	  if (cursors.left.isDown) {planet.sprite.body.force.x = -12000 / planet.radius;}
-	  else if (cursors.right.isDown){planet.sprite.body.force.x = 12000 / planet.radius;}
+	  if (cursors.left.isDown) {planet.sprite.body.force.x = -8000 ;}
+	  else if (cursors.right.isDown){planet.sprite.body.force.x = 8000 ;}
 	  else {planet.sprite.body.force.x = 0;}
 
-	  if (cursors.up.isDown){planet.sprite.body.force.y = -12000 / planet.radius;}
-	  else if (cursors.down.isDown){planet.sprite.body.force.y = 12000 / planet.radius;}
+	  if (cursors.up.isDown){planet.sprite.body.force.y = -8000 ;}
+	  else if (cursors.down.isDown){planet.sprite.body.force.y = 8000 ;}
 	  else {planet.sprite.body.force.y = 0;} 
 	}
 	else if (planet.input.type == "tilt") {
-		planet.sprite.body.force.x = planet.input.beta * 400 / planet.radius;
-		planet.sprite.body.force.y = -planet.input.gamma * 400 / planet.radius;
+		planet.sprite.body.force.x = planet.input.beta * 300 ;
+		planet.sprite.body.force.y = -planet.input.gamma * 300 ;
 	}
+	
+	// Scale movement speed according to radius
+	planet.sprite.body.force.x /= Math.sqrt(planet.radius);
+	planet.sprite.body.force.y /= Math.sqrt(planet.radius);
+//	planet.sprite.body.force.x /= planet.radius;
+//	planet.sprite.body.force.y /= planet.radius;
+	
+	// Add gravity between other planets.
+	planetList.forEach(function (other) {
+		if (!(other && other.exists) || other === planet)
+			return;
+		
+		var distX = other.sprite.position.x - planet.sprite.position.x;
+		var distY = other.sprite.position.y - planet.sprite.position.y;
+		var dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+		
+		var force = other.radius * 500000 / Math.pow(dist, 2);
+		
+		planet.sprite.body.force.x += force * distX / dist;
+		planet.sprite.body.force.y += force * distY / dist;		
+	});
 }
 
 GameState.prototype.render = function(){}
